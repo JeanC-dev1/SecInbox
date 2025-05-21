@@ -1,0 +1,9 @@
+| URL                                                   | Finalidade                                         |
+| ----------------------------------------------------- | -------------------------------------------------- |
+| `http://example.com`                                  | Domínio reservado para exemplos seguros            |
+| `http://testsafebrowsing.appspot.com/s/phishing.html` | Simula um site phishing (Google Safe Browsing)     |
+| `http://phishing.test/login.html`                     | Domínio fictício (não existe, mas parece suspeito) |
+| `http://login.exemplo-verify.com`                     | Falso login para simular URL maliciosa             |
+| `http://paypal.account-security-alert.com`            | Falso subdomínio com aparência de golpe            |
+| `http://secure-update-bank.com/account`               | Simula golpe de banco                              |
+| `http://microsoft-support247.com/reset`               | Simula golpe de suporte                            |
