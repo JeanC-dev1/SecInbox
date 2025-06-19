@@ -1,71 +1,86 @@
+import os
 import re
 import requests
 import whois
 from urllib.parse import urlparse
 from datetime import datetime
 
-def analyze_text(texto, tipo="url"):
+def carregar_lista(nome_arquivo):
+    caminho = os.path.join(os.path.dirname(__file__), "../data", nome_arquivo)
+    try:
+        with open(caminho, "r", encoding="utf-8") as f:
+            return [linha.strip().lower() for linha in f if linha.strip()]
+    except FileNotFoundError:
+        return []
+
+def analisar_texto(texto, tipo="url"):
     if tipo == "url":
         return analisar_url(texto)
     elif tipo == "email":
         return analisar_email(texto)
     else:
-        return {"suspeito": True, "motivo": "Tipo não reconhecido"}
+        return {"suspicious": True, "reason": "Unrecognized input type"}
 
 def analisar_url(url):
     url = url.strip()
+    heuristics = []
 
-    heuristicas = []
+    palavras_suspeitas = carregar_lista("wordlist.txt")
+    tlds_suspeitos = carregar_lista("tlds_suspeitos.txt")
+    encurtadores = carregar_lista("encurtadores.txt")
 
-    # 1. Palavras-chave comuns em phishing
-    palavras_suspeitas = ["login", "senha", "verificação", "urgente", "atualização", "banco", "premio"]
-    if any(p in url.lower() for p in palavras_suspeitas):
-        heuristicas.append("Contém palavras-chave suspeitas")
-
-    # 2. Domínio estranho ou parecido com marcas
-    dominios_duvidosos = [".xyz", ".tk", ".ga", ".ml", ".cf"]
     parsed = urlparse(url)
-    if any(parsed.netloc.endswith(ext) for ext in dominios_duvidosos):
-        heuristicas.append("Domínio de topo suspeito")
+    dominio = parsed.netloc.lower()
 
-    # 3. Link com muitos parâmetros, pode ser camuflado
+    # 1. Palavras-chave
+    if any(p in url.lower() for p in palavras_suspeitas):
+        heuristics.append("Contains suspicious keywords")
+
+    # 2. TLDs suspeitos
+    if any(dominio.endswith(tld) for tld in tlds_suspeitos):
+        heuristics.append("Suspicious top-level domain")
+
+    # 3. Muitos parâmetros
     if url.count("?") > 1 or url.count("=") > 3:
-        heuristicas.append("Link com muitos parâmetros (camuflagem possível)")
+        heuristics.append("URL has too many parameters")
 
-    # 4. Domínio criado recentemente (verifica WHOIS)
+    # 4. Domínio recente
     try:
-        w = whois.whois(parsed.netloc)
-        if w.creation_date:
-            if isinstance(w.creation_date, list):
-                creation = w.creation_date[0]
-            else:
-                creation = w.creation_date
-
-            dias = (datetime.now() - creation).days
-            if dias < 180:
-                heuristicas.append(f"Domínio recente: {dias} dias")
+        info = whois.whois(dominio)
+        if info.creation_date:
+            created = info.creation_date[0] if isinstance(info.creation_date, list) else info.creation_date
+            days = (datetime.now() - created).days
+            if days < 180:
+                heuristics.append(f"Recently registered domain ({days} days old)")
     except:
-        heuristicas.append("Não foi possível verificar o domínio")
+        heuristics.append("WHOIS lookup failed")
 
-    if heuristicas:
-        return {"suspeito": True, "motivo": "; ".join(heuristicas)}
-    else:
-        return {"suspeito": False}
+    # 5. Encurtadores
+    if dominio in encurtadores:
+        heuristics.append("Shortened URL detected")
+        expanded = expandir_url(url)
+        if expanded and expanded != url:
+            heuristics.append(f"Expanded URL: {expanded}")
+
+    return {"suspicious": True, "reason": "; ".join(heuristics)} if heuristics else {"suspicious": False}
+
+def expandir_url(url_encurtada):
+    try:
+        r = requests.head(url_encurtada, allow_redirects=True, timeout=5)
+        return r.url
+    except:
+        return None
 
 def analisar_email(email):
-    heuristicas = []
-
-    # 1. Domínio personalizado estranho
+    heuristics = []
+    palavras_suspeitas = carregar_lista("wordlist.txt")
     dominio = email.split("@")[-1]
+    usuario = email.split("@")[0]
+
     if dominio.endswith(".xyz") or dominio.count("-") > 1:
-        heuristicas.append("Domínio de email incomum ou gratuito")
+        heuristics.append("Unusual or free domain")
 
-    # 2. Nome de usuário suspeito
-    nome = email.split("@")[0]
-    if any(p in nome.lower() for p in ["suporte", "verificacao", "atendimento", "premio"]):
-        heuristicas.append("Usuário do email sugere engenharia social")
+    if any(p in usuario.lower() for p in palavras_suspeitas):
+        heuristics.append("Suspicious sender name")
 
-    if heuristicas:
-        return {"suspeito": True, "motivo": "; ".join(heuristicas)}
-    else:
-        return {"suspeito": False}
+    return {"suspicious": True, "reason": "; ".join(heuristics)} if heuristics else {"suspicious": False}
