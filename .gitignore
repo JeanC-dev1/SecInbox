@@ -3,7 +3,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
+pytest.ini
 # Ambiente virtual
 venv/
 .venv/
@@ -12,13 +12,17 @@ venv/
 # O pip-tools (pip-compile) pode ser usado para gerenciar
 # o requirements.txt. O .gitignore deve ignorar os arquivos de cache.
 .pip-tools/
+tests/
+.tests/
+# Arquivos de dados
+# As listas de palavras são importantes, mantenha-as no Git!
+# /server/data/
 
 # Dados gerados pelo Docker
 *.dockerignore
 
-# Arquivos de dados e de ambiente
-# Mantenha as listas de palavras no Git, mas ignore o .env
-data/
+# Arquivos de ambiente
+# Mantenha este arquivo localmente para suas chaves de API, etc.
 .env
 
 # Empacotamento com PyInstaller
@@ -36,5 +40,5 @@ data/
 .DS_Store
 Thumbs.db
 
-# Log
+# Logs
 *.log
