@@ -1,44 +1,28 @@
-# Arquivos e pastas do Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 pytest.ini
-# Ambiente virtual
+
 venv/
 .venv/
-
-# Pacotes instalados
-# O pip-tools (pip-compile) pode ser usado para gerenciar
-# o requirements.txt. O .gitignore deve ignorar os arquivos de cache.
 .pip-tools/
 tests/
 .tests/
-# Arquivos de dados
-# As listas de palavras são importantes, mantenha-as no Git!
-# /server/data/
 
-# Dados gerados pelo Docker
 *.dockerignore
 
-# Arquivos de ambiente
-# Mantenha este arquivo localmente para suas chaves de API, etc.
 .env
 
-# Empacotamento com PyInstaller
-# Ignore os executáveis, pastas de build e de distribuição
 /server/build/
 /server/dist/
 *.spec
 *.exe
 
-# Arquivos de IDEs (opcional)
 .vscode/
 .idea/
 
-# Arquivos específicos do sistema operacional
 .DS_Store
 Thumbs.db
 
-# Logs
 *.log
