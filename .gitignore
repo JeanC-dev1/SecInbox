@@ -1,50 +1,40 @@
-# Bytecode do Python
+# Arquivos e pastas do Python
 __pycache__/
-*.py[cod]
-*$py.class
-
-# Arquivos temporários e de sistema
-*.log
-*.tmp
-*.swp
-*.DS_Store
-Thumbs.db
+*.pyc
+*.pyo
+*.pyd
 
 # Ambiente virtual
 venv/
+.venv/
+
+# Pacotes instalados
+# O pip-tools (pip-compile) pode ser usado para gerenciar
+# o requirements.txt. O .gitignore deve ignorar os arquivos de cache.
+.pip-tools/
+
+# Dados gerados pelo Docker
+*.dockerignore
+
+# Arquivos de dados e de ambiente
+# Mantenha as listas de palavras no Git, mas ignore o .env
+data/
 .env
-.env.*
 
-# Arquivos de build
-build/
-dist/
+# Empacotamento com PyInstaller
+# Ignore os executáveis, pastas de build e de distribuição
+/server/build/
+/server/dist/
 *.spec
-
-# PyInstaller output
 *.exe
-*.app
-*.deb
-*.rpm
 
-# VSCode settings
+# Arquivos de IDEs (opcional)
 .vscode/
+.idea/
 
-# Testes e cache de testes
-*.pytest_cache/
-.pytest_cache/
-coverage.*
-htmlcov/
-.tox/
+# Arquivos específicos do sistema operacional
+.DS_Store
+Thumbs.db
 
-# Arquivos criados pelo sistema
-*.bak
-*.orig
-
-# Arquivos sensíveis e pessoais
-*.key
-*.pem
-*.p12
-
-# Arquivos de sistema Linux
-.trash/
-.cache/
+# Log
+*.log

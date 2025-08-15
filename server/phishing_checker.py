@@ -5,82 +5,118 @@ import whois
 from urllib.parse import urlparse
 from datetime import datetime
 
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+
+# CArrega uma lista de palavras de um arquivo de texto
 def carregar_lista(nome_arquivo):
-    caminho = os.path.join(os.path.dirname(__file__), "../data", nome_arquivo)
+    caminho = os.path.join(DATA_DIR, nome_arquivo)
     try:
         with open(caminho, "r", encoding="utf-8") as f:
             return [linha.strip().lower() for linha in f if linha.strip()]
     except FileNotFoundError:
         return []
-
+    
+# Função principal para analisar texto como URL ou e-mail
 def analisar_texto(texto, tipo="url"):
+    texto = texto.strip()
     if tipo == "url":
         return analisar_url(texto)
     elif tipo == "email":
         return analisar_email(texto)
     else:
-        return {"suspicious": True, "reason": "Unrecognized input type"}
-
+        return {"suspicious": True, "reason": "Tipo de entrada não reconhecido"}
+    
 def analisar_url(url):
-    url = url.strip()
-    heuristics = []
+    heuristicas = []
 
     palavras_suspeitas = carregar_lista("wordlist.txt")
     tlds_suspeitos = carregar_lista("tlds_suspeitos.txt")
     encurtadores = carregar_lista("encurtadores.txt")
 
-    parsed = urlparse(url)
-    dominio = parsed.netloc.lower()
-
-    # 1. Palavras-chave
-    if any(p in url.lower() for p in palavras_suspeitas):
-        heuristics.append("Contains suspicious keywords")
-
-    # 2. TLDs suspeitos
-    if any(dominio.endswith(tld) for tld in tlds_suspeitos):
-        heuristics.append("Suspicious top-level domain")
-
-    # 3. Muitos parâmetros
-    if url.count("?") > 1 or url.count("=") > 3:
-        heuristics.append("URL has too many parameters")
-
-    # 4. Domínio recente
     try:
-        info = whois.whois(dominio)
-        if info.creation_date:
-            created = info.creation_date[0] if isinstance(info.creation_date, list) else info.creation_date
-            days = (datetime.now() - created).days
-            if days < 180:
-                heuristics.append(f"Recently registered domain ({days} days old)")
-    except:
-        heuristics.append("WHOIS lookup failed")
+        parsed = urlparse(url)
+        dominio = parsed.netloc.lower()
 
-    # 5. Encurtadores
-    if dominio in encurtadores:
-        heuristics.append("Shortened URL detected")
-        expanded = expandir_url(url)
-        if expanded and expanded != url:
-            heuristics.append(f"Expanded URL: {expanded}")
+        # 1. Palavras-chave na URL completa
+        if any(p in url.lower() for p in palavras_suspeitas):
+            heuristicas.append("Contém palavras-chave suspeitas")
 
-    return {"suspicious": True, "reason": "; ".join(heuristics)} if heuristics else {"suspicious": False}
+        # 2. TLDs suspeito
+        if any(dominio.endswith(tld) for tld in tlds_suspeitos):
+            heuristicas.append("Domínio de nível superior (TLD) suspeito")
 
+        # 3. Domínio recente
+        try:
+            info = whois.whois(dominio)
+            if info and info.creation_date:
+                # Tratamento para data, o whois pode retornar a data como lista, string ou datetime
+                criacao = info.creation_date[0] if isinstance(info.creation_date, list) else info.creation_date
+                if isinstance(criacao, str):
+                    criacao = datetime.strftime(criacao, "%Y-%m-%d %H:%M:%S")
+
+                dias = (datetime.now() - criacao).days
+                if dias < 180:
+                    heuristicas.append(f"Domínio registrado recentemente ({dias} dias)")
+        except whois.parser.PywhoisError:
+            heuristicas.append("Falha na consulta WHOIS")
+        except Exception:
+            heuristicas.append("Erro ao processar a data WHOIS")
+
+        # 4. Encurtadores de URL
+        if dominio in encurtadores:
+            heuristicas.append("URL encurtada detectada")
+            expandida = expandir_url(url)
+            if expandida and expandida != url:
+                heuristicas.append(f"URL expandida: {expandida}")
+        else: 
+            # 5. URL com muitos parâmetros
+            if url.count("?") > 1 or url.count("=") > 3:
+                heuristicas.append("URL com muitos parâmetros (chance de ofuscamento)")
+
+        if heuristicas:
+            return {"suspicious": True, "reason": "; ".join(heuristicas)}
+        else:
+            return {"suspicious": False, "reason": "Nenhum indicador de phishing encontrado"}
+        
+    except Exception:
+        return {"suspicious": True, "reason": "Erro ao processar URL"}
+    
+# Tenta expandir uma URL encurtada    
 def expandir_url(url_encurtada):
     try:
         r = requests.head(url_encurtada, allow_redirects=True, timeout=5)
         return r.url
-    except:
+    except requests.exceptions.RequestException:
         return None
 
+# Analisa um e-mail em busca de indicadores de phishing    
 def analisar_email(email):
-    heuristics = []
+    heuristicas = []
     palavras_suspeitas = carregar_lista("wordlist.txt")
-    dominio = email.split("@")[-1]
-    usuario = email.split("@")[0]
 
-    if dominio.endswith(".xyz") or dominio.count("-") > 1:
-        heuristics.append("Unusual or free domain")
+    try:
+        partes_email = email.split("@")
+        if len(partes_email) != 2:
+            raise ValueError("Formato de email inválido")
+        
+        usuario = partes_email[0].lower()
+        dominio = partes_email[1].lower()
 
-    if any(p in usuario.lower() for p in palavras_suspeitas):
-        heuristics.append("Suspicious sender name")
+        # 1. Domínios incomuns ou gratuitos
+        tlds_suspeitos = carregar_lista("tlds_suspeitos.txt")
+        if any(dominio.endswith(tld) for tld in tlds_suspeitos):
+            heuristicas.append("Domínio de nível superio (TLD) suspeito")
+        
+        # 2. Nome de usuário suspeito
+        if any(p in usuario for p in palavras_suspeitas):
+            heuristicas.append("Nome de usuário suspeito")
 
-    return {"suspicious": True, "reason": "; ".join(heuristics)} if heuristics else {"suspicious": False}
+        if heuristicas:
+            return {"suspicious": True, "reason": "; ".join(heuristicas)}
+        else:
+            return {"suspicious": False, "reason": "Nenhum indicador de phishing encontrado"}
+        
+    except ValueError:
+        return {"suspicious": True, "reason": "Formato de e-mail inválido"}
+    except IndexError:
+        return {"suspicious": True, "reason": "Formato de e-mail inválido"}
