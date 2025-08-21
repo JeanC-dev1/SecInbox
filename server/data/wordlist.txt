@@ -9,6 +9,7 @@ bloqueio
 confirm
 confirmação
 conta
+contato
 credentials
 fatura
 limite
@@ -19,7 +20,7 @@ password
 payment
 pix
 prize
-prêmio
+premio
 reset
 security
 segurança

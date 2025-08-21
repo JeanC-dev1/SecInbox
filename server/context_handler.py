@@ -1,44 +1,25 @@
-import sys
-import os
-from phishing_checker import analyze_text
+# server/context_handler.py
 
-def detectar_tipo(texto):
-    texto = texto.strip()
-    if "@" in texto and "." in texto:
-        return "email"
-    elif texto.startswitch("http://") or texto.startswitch("https://"):
-        return "url"
-    else:
-        return "desconhecido"
-    
-def processar_entrada(texto):
-    tipo = detectar_tipo(texto)
-    if tipo == "desconhecido":
-        return {
-            "resultado": "Formato não reconhecido.",
-            "suspeito": None
-        }
-    
-    resultado = analyze_text(texto, tipo=tipo)
-    return {
-        "resultado": resultado.get("motivo", "Seguro"),
-        "suspeito": resultado["suspeito"]
-    }
+class ContextHandler:
+    #Gerencia o histórico de conversas para a sessão de chat.
+    #Cada usuário terá seu próprio histórico armazenado em memória.
+    def __init__(self):
+        # Dicionário para armazenar o histórico de cada usuário.
+        # A chave será o ID do usuário e o valor
+        self.sessions = {}
 
-def main():
-    if len(sys.argv) < 2:
-        print("Uso: context_handler.py \"<texto>\"")
-        sys.exit(1)
+    def add_message(self, user_id, role, content):
+        #Adiciona uma nova mensagem ao histórico de um usuário
+        if user_id not in self.sessions:
+            self.sessions[user_id] = []
+        
+        self.sessions[user_id].append({'role': role, 'parts': [content]})
 
-    texto = sys.argv[1]
-    resultado = processar_entrada(texto)
+    def get_history(self, user_id):
+        #Retorna o histórico de conversas de um usuário.
+        return self.sessions.get(user_id, [])
 
-    # Exibição simples no terminal
-    print("\n--- Análise ---")
-    print(f"Texto: {texto}")
-    print(f"Suspeito: {'Sim' if resultado['suspeito'] else 'Não'}")
-    print(f"Motivo: {resultado['resultado']}")
-    print("----------------")
-
-if __name__ == "__main__":
-    main()
+    def reset_session(self, user_id):
+        #Limpa o histórico de conversas de um usuário.
+        if user_id in self.sessions:
+            self.sessions[user_id] = []

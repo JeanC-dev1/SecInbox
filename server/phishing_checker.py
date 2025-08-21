@@ -17,7 +17,7 @@ def carregar_lista(nome_arquivo):
         return []
     
 # Função principal para analisar texto como URL ou e-mail
-def analisar_texto(texto, tipo="url"):
+def analisar_texto(texto, tipo):
     texto = texto.strip()
     if tipo == "url":
         return analisar_url(texto)
