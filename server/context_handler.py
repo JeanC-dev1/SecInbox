@@ -2,10 +2,8 @@
 
 class ContextHandler:
     #Gerencia o histórico de conversas para a sessão de chat.
-    #Cada usuário terá seu próprio histórico armazenado em memória.
     def __init__(self):
         # Dicionário para armazenar o histórico de cada usuário.
-        # A chave será o ID do usuário e o valor
         self.sessions = {}
 
     def add_message(self, user_id, role, content):
