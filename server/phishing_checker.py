@@ -1,5 +1,4 @@
 import os
-import re
 import requests
 import whois
 from urllib.parse import urlparse
@@ -52,7 +51,7 @@ def analisar_url(url):
                 # Tratamento para data, o whois pode retornar a data como lista, string ou datetime
                 criacao = info.creation_date[0] if isinstance(info.creation_date, list) else info.creation_date
                 if isinstance(criacao, str):
-                    criacao = datetime.strftime(criacao, "%Y-%m-%d %H:%M:%S")
+                    criacao = datetime.strptime(criacao, "%Y-%m-%d %H:%M:%S")
 
                 dias = (datetime.now() - criacao).days
                 if dias < 180:
@@ -120,3 +119,4 @@ def analisar_email(email):
         return {"suspicious": True, "reason": "Formato de e-mail inválido"}
     except IndexError:
         return {"suspicious": True, "reason": "Formato de e-mail inválido"}
+    
