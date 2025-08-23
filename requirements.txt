@@ -4,3 +4,5 @@ requests
 python-dotenv
 pytest
 PyInstaller
+google-generativeai
+dotenv
