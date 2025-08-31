@@ -1,11 +1,9 @@
-import os
-import google.generativeai as genai
-
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_smorest import Api
 from dotenv import load_dotenv
+
 from api.chat_routes import blp as ChatBlueprint
-from context_handler import ContextHandler
+from api.status_route import blp as StatusBlueprint
 
 load_dotenv()
 
@@ -20,21 +18,10 @@ app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
 app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
 api = Api(app)
-context_handler = ContextHandler()
 
-# Endpoint para reiniciar o contexto
-@app.route('/reset', methods=['POST'])
-def reset_chat():
-    data = request.json
-    user_id = data.get('user_id')
-    if user_id:
-        context_handler.reset_session(user_id)
-        # O chat_sessions deve ser resetado no novo arquivo de rotas, ou no context_handler
-        return jsonify({"message": "Sessão resetada"})
-    return jsonify({"error": "user_id é obrigatório"}), 400
-
-# Registra o Blueprint na API
+# Registra as Blueprint na API
 api.register_blueprint(ChatBlueprint)
+api.register_blueprint(StatusBlueprint)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
