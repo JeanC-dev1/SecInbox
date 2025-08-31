@@ -6,3 +6,5 @@ pytest
 PyInstaller
 google-generativeai
 dotenv
+Flask-Smorest 
+marshmallow
