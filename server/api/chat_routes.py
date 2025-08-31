@@ -12,7 +12,7 @@ from schemas import ChatRequestSchema, ChatResponseSchema
 blp = Blueprint("Chat", __name__, url_prefix="/chat", description="Endpoints para o assistente")
 
 # Configura API do Gemini
-genai.consfigure(api_key=os.getenv("GOOGLE_API_KEY"))
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 model = genai.GenerativeModel('models/gemini-1.5-flash')
 context_handler = ContextHandler()
 chat_sessions = {}
