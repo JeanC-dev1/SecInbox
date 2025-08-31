@@ -1,16 +1,12 @@
 import os
 import google.generativeai as genai
+
 from flask import Flask, jsonify, request
 from flask_smorest import Api
 from dotenv import load_dotenv
-
-# Importa o Blueprint do seu novo arquivo de rotas
 from api.chat_routes import blp as ChatBlueprint
-
-# Importa os outros módulos (se necessário)
 from context_handler import ContextHandler
 
-# Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
 
 app = Flask(__name__)
@@ -24,7 +20,7 @@ app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
 app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
 api = Api(app)
-context_handler = ContextHandler() # Mantém a instância aqui se for usada em outras rotas
+context_handler = ContextHandler()
 
 # Endpoint para reiniciar o contexto
 @app.route('/reset', methods=['POST'])
