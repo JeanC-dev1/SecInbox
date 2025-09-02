@@ -3,7 +3,7 @@ __pycache__/
 *.pyo
 *.pyd
 pytest.ini
-.pystest_cache
+.pytest_cache
 
 venv/
 .venv/
