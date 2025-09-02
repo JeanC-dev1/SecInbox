@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_smorest import Api
 from dotenv import load_dotenv
-
 from api.chat_routes import blp as ChatBlueprint
 from api.status_route import blp as StatusBlueprint
 

@@ -1,5 +1,3 @@
-# server/context_handler.py
-
 class ContextHandler:
     #Gerencia o histórico de conversas para a sessão de chat.
     def __init__(self):
