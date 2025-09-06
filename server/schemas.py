@@ -1,8 +1,9 @@
 from marshmallow import Schema, fields
-
-class ChatRequestSchema(Schema):
-    user_id = fields.String(required=True)
-    message = fields.String(required=True)
+from marshmallow.validate import OneOf
 
 class ChatResponseSchema(Schema):
     response = fields.String(required=True)
+
+class CheckerSchema(Schema):
+    texto = fields.String(required=True)
+    tipo = fields.String(required=True, validate=OneOf(["url", "email"]))

@@ -1,9 +1,13 @@
+import os
 from flask import Flask
 from flask_smorest import Api
 from dotenv import load_dotenv
-from api.chat_routes import blp as ChatBlueprint
-from api.status_route import blp as StatusBlueprint
 
+# Importa os Blueprints dos arquivos de rotas
+from api.security_checker_routes import blp as SecurityCheckerBlueprint
+from api.status_routes import blp as StatusBlueprint
+
+# Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
 
 app = Flask(__name__)
@@ -18,8 +22,8 @@ app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-
 
 api = Api(app)
 
-# Registra as Blueprint na API
-api.register_blueprint(ChatBlueprint)
+# Registra os Blueprints na API
+api.register_blueprint(SecurityCheckerBlueprint)
 api.register_blueprint(StatusBlueprint)
 
 if __name__ == '__main__':

@@ -1,10 +1,6 @@
 Flask
+Flask-Smorest
+marshmallow
 python-whois
 requests
 python-dotenv
-pytest
-PyInstaller
-google-generativeai
-dotenv
-Flask-Smorest 
-marshmallow

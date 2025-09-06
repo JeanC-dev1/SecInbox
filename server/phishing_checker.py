@@ -29,6 +29,7 @@ def analisar_texto(texto, tipo):
 def analisar_url(url):
     heuristicas = []
 
+    # Carregas os aruivos que contém as wordlist que o sistema se baseia para realizar a analise
     palavras_suspeitas = carregar_lista("wordlist.txt")
     tlds_suspeitos = carregar_lista("tlds_suspeitos.txt")
     encurtadores = carregar_lista("encurtadores.txt")
