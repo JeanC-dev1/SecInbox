@@ -1,6 +1,0 @@
-Flask
-Flask-Smorest
-marshmallow
-python-whois
-requests
-python-dotenv

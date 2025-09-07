@@ -11,9 +11,14 @@ venv/
 tests/
 .tests/
 
+.scannerwork/*
+scannerwork/
+sonar-project.properties
+
 *.dockerignore
 
 .env
+sonarqube/
 
 /server/build/
 /server/dist/
