@@ -57,11 +57,13 @@ curl -X POST \
   -d '{
     "texto": "[http://site-suspeito.com.br](http://site-suspeito.com.br)",
     "tipo": "url"
-  }```
+  }'
+```
 
-  **Resposta:**
-  ```bash
-  {
+**Resposta:**
+```bash
+{
     "suspicious": true,
     "reason": "Indicador de phishing encontrado."
-  }
+}
+```
