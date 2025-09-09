@@ -37,12 +37,12 @@ jobs:
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@master
         env:
-          SONAR_TOKEN: ${{ secrets.E3E54934A3E193F5C34EFD16B5225E472D0A98CE }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.https://sonarcloud.io }}
 
       # 6. (opcional) Quality Gate
       - name: SonarQube Quality Gate check
         uses: SonarSource/sonarqube-quality-gate-action@master
         env:
-          SONAR_TOKEN: ${{ secrets.E3E54934A3E193F5C34EFD16B5225E472D0A98CE }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.https://sonarcloud.io }}
